@@ -240,9 +240,12 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
         if (depth >= 3 && moves_played >= 4 && quiet) {
             i32 reduction =
               static_cast<i32>(0.77 + std::log(depth) * std::log(moves_played) / 2.36);
+
             reduction -= PV_NODE;
             reduction += cut_node;
+
             Depth reduced_depth = std::clamp<Depth>(new_depth - reduction, 1, new_depth);
+            
             value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, reduced_depth, ply + 1, true);
             if (value > alpha && reduced_depth < new_depth) {
                 value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth, ply + 1, !cut_node);
