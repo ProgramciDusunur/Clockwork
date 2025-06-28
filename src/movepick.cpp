@@ -99,7 +99,6 @@ Move MovePicker::pick_next(MoveList& moves) {
             best_idx = i;
         }
     }
-
     std::swap(m_scores[m_current_index], m_scores[best_idx]);
     std::swap(moves[m_current_index], moves[best_idx]);
     return moves[m_current_index++];
