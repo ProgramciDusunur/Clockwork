@@ -255,7 +255,7 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
 
             if (quiet) {
                 // if the move have good history decrease reduction other hand the move have bad history then reduce more
-                auto move_history_reduction = move_history / 16384;
+                auto move_history_reduction = move_history / 16384;                
                 reduction -= move_history_reduction;
             }
 
