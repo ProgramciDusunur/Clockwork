@@ -186,6 +186,7 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
         return tt_data->score >= beta ? (tt_data->score * 3 + beta) / 4 :
                                         tt_data->score;
     }
+    
 
     bool  is_in_check = pos.is_in_check();
     Value static_eval = is_in_check ? -VALUE_INF : evaluate(pos);
