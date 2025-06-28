@@ -250,12 +250,12 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
         if (depth >= 3 && moves_played >= 4 && quiet) {
             i32 reduction =
               static_cast<i32>(0.77 + std::log(depth) * std::log(moves_played) / 2.36);
-            
+
             reduction -= PV_NODE;
 
             if (quiet) {
                 // if the move have good history decrease reduction other hand the move have bad history then reduce more
-                auto move_history_reduction = move_history / 8192;
+                auto move_history_reduction = move_history / 16384;
                 reduction -= move_history_reduction;
             }
 
