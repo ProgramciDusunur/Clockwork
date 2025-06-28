@@ -234,6 +234,9 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
     // Iterate over the move list
     for (Move m = moves.next(); m != Move::none(); m = moves.next()) {
         bool quiet = quiet_move(m);
+
+        auto move_history = m_td.history.get_quiet_stats(pos, m);
+
         // Do move
         Position pos_after = pos.move(m);
         moves_played++;
@@ -247,8 +250,16 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
         if (depth >= 3 && moves_played >= 4 && quiet) {
             i32 reduction =
               static_cast<i32>(0.77 + std::log(depth) * std::log(moves_played) / 2.36);
+
             reduction -= PV_NODE;
+            if (quiet) {
+                // if the move have good history decrease reduction other hand the move have bad history then reduce more
+                auto move_history_reduction = move_history / 8192;
+                reduction -= move_history_reduction;
+            }
+
             Depth reduced_depth = std::clamp<Depth>(new_depth - reduction, 1, new_depth);
+
             value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, reduced_depth, ply + 1);
             if (value > alpha && reduced_depth < new_depth) {
                 value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth, ply + 1);
