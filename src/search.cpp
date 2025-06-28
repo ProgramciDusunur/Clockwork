@@ -242,7 +242,7 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
               static_cast<i32>(0.77 + std::log(depth) * std::log(moves_played) / 2.36);
 
             reduction -= PV_NODE;
-            reduction += 2 * cut_node;
+            reduction += 2 * cut_node;        
 
             Depth reduced_depth = std::clamp<Depth>(new_depth - reduction, 1, new_depth);
             
