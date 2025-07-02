@@ -274,7 +274,7 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
             // Post LMR
             if (value > alpha && reduced_depth < new_depth) {
                 
-                new_depth -= score > best_value + 35;
+                new_depth -= value > best_value + 35;
                 value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth, ply + 1);
             }
 
