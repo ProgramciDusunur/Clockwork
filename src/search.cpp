@@ -271,6 +271,8 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
             Depth reduced_depth = std::clamp<Depth>(new_depth - reduction, 1, new_depth);
             value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, reduced_depth, ply + 1);
             if (value > alpha && reduced_depth < new_depth) {
+                
+                new_depth -= score < bestScore + new_depth;
                 value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth, ply + 1);
             }
         } else if (!PV_NODE || moves_played > 1) {
