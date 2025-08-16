@@ -275,6 +275,11 @@ Value Worker::search(Position& pos, Stack* ss, Value alpha, Value beta, Depth de
             i32 reduction =
               static_cast<i32>(0.77 + std::log(depth) * std::log(moves_played) / 2.36);
             reduction -= PV_NODE;
+            if (quiet) {
+                // if the move have good history decrease reduction other hand the move have bad history then reduce more
+                auto move_history_reduction = move_history / 8192;                
+                reduction -= move_history_reduction;
+            }
             Depth reduced_depth = std::clamp<Depth>(new_depth - reduction, 1, new_depth);
             value = -search<false>(pos_after, ss + 1, -alpha - 1, -alpha, reduced_depth, ply + 1);
             if (value > alpha && reduced_depth < new_depth) {
