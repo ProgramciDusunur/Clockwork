@@ -455,9 +455,9 @@ Value Worker::search(
                 
                 ss->singular_move = m;
                 
-                const auto singular_score = -search<IS_MAIN, false>(pos_after, ss + 1, -singular_beta - 1,
+                const Value singular_score = -search<IS_MAIN, false>(pos_after, ss + 1, -singular_beta - 1,
                                                                           -singular_beta, singular_depth,
-                                                                          ply + 1, true);
+                                                                          ply + 1, false);
 
                 m_td.pop_psqt_state();                                    
 
