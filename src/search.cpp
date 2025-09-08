@@ -341,7 +341,7 @@ Value Worker::search(
     }
 
     auto tt_data = m_searcher.tt.probe(pos, ply);
-    if (!PV_NODE && !ss->singular_move && tt_data && tt_data->depth >= depth
+    if (!PV_NODE && ss->singular_move == Move::none() && tt_data && tt_data->depth >= depth
         && (tt_data->bound == Bound::Exact
             || (tt_data->bound == Bound::Lower && tt_data->score >= beta)
             || (tt_data->bound == Bound::Upper && tt_data->score <= alpha))) {
@@ -352,7 +352,7 @@ Value Worker::search(
     Value correction  = 0;
     Value raw_eval    = -VALUE_INF;
     Value static_eval = -VALUE_INF;
-    if (!is_in_check && !ss->singular_move) {
+    if (!is_in_check) {
         correction  = m_td.history.get_correction(pos);
         raw_eval    = is_in_check ? -VALUE_INF : evaluate(pos);
         static_eval = raw_eval + correction;
@@ -365,16 +365,16 @@ Value Worker::search(
 
     // Reuse TT score as a better positional evaluation
     auto tt_adjusted_eval = static_eval;
-    if (tt_data && tt_data->bound != (tt_data->score > static_eval ? Bound::Upper : Bound::Lower)) {
+    if (tt_data && ss->singular_move == Move::none() && tt_data->bound != (tt_data->score > static_eval ? Bound::Upper : Bound::Lower)) {
         tt_adjusted_eval = tt_data->score;
     }
 
-    if (!PV_NODE && !ss->singular_move && !is_in_check && depth <= tuned::rfp_depth
+    if (!PV_NODE && ss->singular_move == Move::none() && !is_in_check && depth <= tuned::rfp_depth
         && tt_adjusted_eval >= beta + tuned::rfp_margin * depth) {
         return tt_adjusted_eval;
     }
 
-    if (!PV_NODE && !is_in_check && !ss->singular_move && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
+    if (!PV_NODE && !is_in_check && ss->singular_move == Move::none() && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
         && tt_adjusted_eval >= beta) {
         int      R = tuned::nmp_base_r + depth / 4 + std::min(3, (tt_adjusted_eval - beta) / 400);
         Position pos_after = pos.null_move();
@@ -392,7 +392,7 @@ Value Worker::search(
     }
 
     // Razoring
-    if (!PV_NODE && !ss->singular_move && !is_in_check && depth <= 7 && static_eval + 707 * depth < alpha) {
+    if (!PV_NODE && ss->singular_move == Move::none() && !is_in_check && depth <= 7 && static_eval + 707 * depth < alpha) {
         const Value razor_score = quiesce<IS_MAIN>(pos, ss, alpha, beta, ply);
         if (razor_score <= alpha) {
             return razor_score;
@@ -448,7 +448,7 @@ Value Worker::search(
         auto extensions = 0;
 
         // Singular Extensions
-        if (!ROOT_NODE && depth >= 7 && m == tt_data->move && !ss->singular_move &&
+        if (!ROOT_NODE && depth >= 7 && m == tt_data->move && ss->singular_move == Move::none()  &&
             tt_data->depth >= depth - 3 && tt_data->bound != Bound::Upper && abs(tt_data->score) < VALUE_MATED) {
                 const auto singular_beta = tt_data->score - depth;
                 const auto singular_depth = (depth - 1) / 2;
@@ -588,13 +588,13 @@ Value Worker::search(
                 : best_move != Move::none() ? Bound::Exact
                                             : Bound::Upper;
 
-    if (!ss->singular_move) {
+    if (ss->singular_move == Move::none()) {
         m_searcher.tt.store(pos, ply, best_move, best_value, depth, bound);
     }
     
 
     // Update to correction history.
-    if (!is_in_check && !ss->singular_move
+    if (!is_in_check && ss->singular_move == Move::none()
         && !(best_move != Move::none() && (best_move.is_capture() || best_move.is_promotion()))
         && !((bound == Bound::Lower && best_value <= static_eval)
              || (bound == Bound::Upper && best_value >= static_eval))) {
