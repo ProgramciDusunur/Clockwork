@@ -478,6 +478,10 @@ Value Worker::search(
 
         Value extensions = 0;
 
+        if (VALUE_MATED < 0) {
+            std::cerr << "VALUE_MATED is negative!" << std::endl;
+        }
+
          // Singular Extensions
         if (!ROOT_NODE && depth >= 7 && m == tt_data->move && !ss->singular_move &&
             tt_data->depth >= depth - 3 && tt_data->bound != Bound::Upper && abs(tt_data->score) < VALUE_MATED) {

@@ -59,6 +59,10 @@ struct Move {
         return MoveFlags{static_cast<u16>(raw & (0xF << 12))};
     }
 
+    [[nodiscard]] explicit operator bool() const {
+        return raw != 0;
+    }
+
     [[nodiscard]] constexpr bool is_capture() const {
         return raw & static_cast<u16>(MoveFlags::CaptureBit);
     }
