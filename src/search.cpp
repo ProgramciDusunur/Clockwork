@@ -466,6 +466,24 @@ Value Worker::search(
             }
         }
 
+        // Singular Extensions
+        if (!ROOT_NODE && depth >= 7 && m == tt_data->move && !ss->singular_move &&
+            tt_data->depth >= depth - 3 && tt_data->bound != Bound::Upper && abs(tt_data->score) < VALUE_MATED) {
+                const auto singular_beta = tt_data->score - depth;
+                const auto singular_depth = (depth - 1) / 2;
+                
+                ss->singular_move = m;
+                
+                const auto singular_score = search<IS_MAIN, false>(pos_after, ss, singular_beta - 1,
+                                                                          singular_beta, singular_depth,
+                                                                          ply, true);
+
+                ss->singular_move = Move::none();
+                if (singular_score < singular_beta) {
+                    extensions++;
+                }
+        }
+
         // Do move
         ss->cont_hist_entry = &m_td.history.get_cont_hist_entry(pos, m);
 
