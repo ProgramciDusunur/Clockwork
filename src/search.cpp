@@ -479,7 +479,7 @@ Value Worker::search(
         Value extensions = 0;
 
         if (VALUE_MATED < 0) {
-            std::cerr << "VALUE_MATED is negative!" << std::endl;
+            std::cout << "VALUE_MATED is negative!";
         }
 
          // Singular Extensions
