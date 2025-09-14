@@ -469,11 +469,16 @@ Value Worker::search(
             if (depth <= 10 && !SEE::see(pos, m, see_threshold)) {
                 continue;
             }
-        }
+        }        
+
+        // Do move
+        ss->cont_hist_entry = &m_td.history.get_cont_hist_entry(pos, m);
+
+        Position pos_after = pos.move(m, m_td.push_psqt_state());
 
         Value extensions = 0;
 
-        // Singular Extensions
+         // Singular Extensions
         if (!ROOT_NODE && depth >= 7 && m == tt_data->move && !ss->singular_move &&
             tt_data->depth >= depth - 3 && tt_data->bound != Bound::Upper && abs(tt_data->score) < VALUE_MATED) {
                 const Value singular_beta = tt_data->score - depth;
@@ -492,10 +497,6 @@ Value Worker::search(
         }
         
 
-        // Do move
-        ss->cont_hist_entry = &m_td.history.get_cont_hist_entry(pos, m);
-
-        Position pos_after = pos.move(m, m_td.push_psqt_state());
         moves_played++;
 
         // Put hash into repetition table. TODO: encapsulate this and any other future adjustment to do "on move" into a proper function
