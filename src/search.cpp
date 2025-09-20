@@ -424,7 +424,7 @@ Value Worker::search(
     }
 
     // Razoring
-    if (!PV_NODE && !is_in_check && depth <= 7 && ss->static_eval + 707 * depth < alpha) {
+    if (!PV_NODE && !is_in_check && depth <= 7 && tt_adjusted_eval + 707 * depth < alpha) {
         const Value razor_score = quiesce<IS_MAIN>(pos, ss, alpha, beta, ply);
         if (razor_score <= alpha) {
             return razor_score;
@@ -505,6 +505,10 @@ Value Worker::search(
 
             if ((ss + 1)->fail_high_count > 3) {
                 reduction += 1024;
+            }
+
+            if (m == ss->killer) {
+                reduction -= 1024;
             }
 
             if (quiet) {
