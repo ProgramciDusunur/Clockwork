@@ -511,7 +511,6 @@ Value Worker::search(
                 reduction -= 1024;
             }
             
-
             if (quiet) {
                 reduction += (1024 - move_history / 8);
             }
