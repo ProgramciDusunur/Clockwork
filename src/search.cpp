@@ -577,9 +577,8 @@ Value Worker::search(
     if (best_value >= beta) {
         const i32 bonus = std::min(1896, 4 * depth * depth + 120 * depth - 120);
         if (quiet_move(best_move)) {
-            const i32 history_depth = depth + best_value > beta + 50;
-            
-            
+            const i32 history_depth = depth + (best_value > beta + 50);
+                               
             const i32 quiet_bonus = std::min(1896, 4 * history_depth * history_depth + 120 * history_depth - 120);
             ss->killer = best_move;
 
