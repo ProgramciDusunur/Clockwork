@@ -621,7 +621,7 @@ Value Worker::search(
     // Checkmate / Stalemate check
     if (best_value == -VALUE_INF) {
         if (excluded) {
-            return alpha
+            return alpha;
         } else {
             if (pos.is_in_check()) {
             return mated_in(ply);
@@ -631,7 +631,7 @@ Value Worker::search(
         }        
     }
 
-    
+
 
     if (!excluded) {
         Bound bound   = best_value >= beta        ? Bound::Lower
