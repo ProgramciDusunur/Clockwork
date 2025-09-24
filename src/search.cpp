@@ -631,8 +631,6 @@ Value Worker::search(
         }        
     }
 
-
-
     if (!excluded) {
         Bound bound   = best_value >= beta        ? Bound::Lower
                   : best_move != Move::none() ? Bound::Exact
