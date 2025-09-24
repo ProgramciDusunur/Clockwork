@@ -392,7 +392,6 @@ Value Worker::search(
             m_searcher.tt.store(pos, ply, raw_eval, Move::none(), -VALUE_INF, 0, Bound::None);
         }
     }
-    
 
     // Internal Iterative Reductions
     if (!excluded && (PV_NODE || cutnode) && depth >= 8 && (!tt_data || tt_data->move == Move::none())) {
