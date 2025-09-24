@@ -392,15 +392,16 @@ Value Worker::search(
             m_searcher.tt.store(pos, ply, raw_eval, Move::none(), -VALUE_INF, 0, Bound::None);
         }
     }
+    
 
     // Internal Iterative Reductions
-    if ((PV_NODE || cutnode) && depth >= 8 && (!tt_data || tt_data->move == Move::none())) {
+    if (!excluded && (PV_NODE || cutnode) && depth >= 8 && (!tt_data || tt_data->move == Move::none())) {
         depth--;
     }
 
     // Reuse TT score as a better positional evaluation
     auto tt_adjusted_eval = ss->static_eval;
-    if (tt_data && tt_data->bound != Bound::None
+    if (tt_data && tt_data->bound != Bound::None && !excluded
         && tt_data->bound != (tt_data->score > ss->static_eval ? Bound::Upper : Bound::Lower)) {
         tt_adjusted_eval = tt_data->score;
     }
