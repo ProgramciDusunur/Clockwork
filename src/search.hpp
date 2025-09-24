@@ -61,6 +61,7 @@ private:
 struct Stack {
     Value          static_eval;
     Move           killer;
+    Move           excluded_move;
     ContHistEntry* cont_hist_entry;
     i32            fail_high_count;
     PV             pv;
