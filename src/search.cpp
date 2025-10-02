@@ -332,6 +332,7 @@ Value Worker::search(
     }
 
     const bool ROOT_NODE = ply == 0;
+    bool       excluded  = ss->excluded_move != Move::none();
 
     // TODO: search nodes limit condition here
     // ...
@@ -370,7 +371,7 @@ Value Worker::search(
         return evaluate(pos);
     }
 
-    auto tt_data = m_searcher.tt.probe(pos, ply);
+    auto tt_data = excluded ? std::nullopt : m_searcher.tt.probe(pos, ply);
     bool ttpv = PV_NODE;
 
     if (!PV_NODE && tt_data) {
@@ -401,24 +402,29 @@ Value Worker::search(
     }
 
     // Internal Iterative Reductions
-    if ((PV_NODE || cutnode) && depth >= 8 && (!tt_data || tt_data->move == Move::none())) {
+    if (!excluded && (PV_NODE || cutnode) && depth >= 8 && (!tt_data || tt_data->move == Move::none())) {
         depth--;
     }
 
     // Reuse TT score as a better positional evaluation
     auto tt_adjusted_eval = ss->static_eval;
-    if (tt_data && tt_data->bound() != Bound::None && abs(tt_data->score) < VALUE_WIN
+    if (tt_data && tt_data->bound() != Bound::None && abs(tt_data->score) < VALUE_WIN && !excluded
         && tt_data->bound() != (tt_data->score > ss->static_eval ? Bound::Upper : Bound::Lower)) {
         tt_adjusted_eval = tt_data->score;
     }
 
-    if (!PV_NODE && !is_in_check && depth <= tuned::rfp_depth
+    if (!PV_NODE && !excluded && !is_in_check && depth <= tuned::rfp_depth
         && tt_adjusted_eval >= beta + tuned::rfp_margin * depth) {
         return tt_adjusted_eval;
     }
 
+<<<<<<< HEAD
     if (!PV_NODE && !is_in_check && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
         && tt_adjusted_eval >= beta + 30) {
+=======
+    if (!PV_NODE && !excluded && !is_in_check && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
+        && tt_adjusted_eval >= beta) {
+>>>>>>> ccb945b (init Sİngular Extensions)
         int R =
           tuned::nmp_base_r + depth / 4 + std::min(3, (tt_adjusted_eval - beta) / 400) + improving;
         Position pos_after = pos.null_move();
@@ -436,7 +442,7 @@ Value Worker::search(
     }
 
     // Razoring
-    if (!PV_NODE && !is_in_check && depth <= 7 && ss->static_eval + 707 * depth < alpha) {
+    if (!PV_NODE && !is_in_check && !excluded && depth <= 7 && ss->static_eval + 707 * depth < alpha) {
         const Value razor_score = quiesce<IS_MAIN>(pos, ss, alpha, beta, ply);
         if (razor_score <= alpha) {
             return razor_score;
@@ -458,6 +464,10 @@ Value Worker::search(
 
     // Iterate over the move list
     for (Move m = moves.next(); m != Move::none(); m = moves.next()) {
+        if (m == ss->excluded_move) {
+            continue;
+        }
+
         const auto nodes_before = m_search_nodes.load(std::memory_order::relaxed);
         bool       quiet        = quiet_move(m);
 
@@ -488,6 +498,23 @@ Value Worker::search(
             }
         }
 
+        // Singular extensions
+        int extension = 0;
+        if (!excluded && tt_data && m == tt_data->move && depth >= 7 && tt_data->depth >= depth - 3
+            && tt_data->bound & Bound::Lower) {
+            Value singular_beta  = tt_data->score - depth * 2;
+            int   singular_depth = depth / 2;
+
+            ss->excluded_move    = m;
+            Value singular_value = search<IS_MAIN, false>(pos, ss, singular_beta - 1, singular_beta,
+                                                          singular_depth, ply, cutnode);
+            ss->excluded_move    = Move::none();
+
+            if (singular_value < singular_beta) {
+                extension = 1;
+            }
+        }
+
         // Do move
         ss->cont_hist_entry = &m_td.history.get_cont_hist_entry(pos, m);
 
@@ -498,7 +525,7 @@ Value Worker::search(
         repetition_info.push(pos_after.get_hash_key(), pos_after.is_reversible(m));
 
         // Get search value
-        Depth new_depth = depth - 1 + pos_after.is_in_check();
+        Depth new_depth = depth - 1 + pos_after.is_in_check() + extension;
         Value value;
         if (depth >= 3 && moves_played >= 2 + 2 * PV_NODE) {
             i32 reduction = static_cast<i32>(
@@ -616,26 +643,34 @@ Value Worker::search(
 
     // Checkmate / Stalemate check
     if (best_value == -VALUE_INF) {
-        if (pos.is_in_check()) {
-            return mated_in(ply);
+        if (excluded) {
+            return alpha;
         } else {
-            return 0;
+            if (pos.is_in_check()) {
+            return mated_in(ply);
+            } else {
+                return 0;
+            }
+        }        
+    }
+
+    if (!excluded) {
+        Bound bound   = best_value >= beta        ? Bound::Lower
+                  : best_move != Move::none() ? Bound::Exact
+                                              : Bound::Upper;
+        Move  tt_move = best_move != Move::none() ? best_move : tt_data ? tt_data->move : Move::none();
+        m_searcher.tt.store(pos, ply, raw_eval, tt_move, best_value, depth, ttpv, bound);
+
+        // Update to correction history.
+        if (!is_in_check
+            && !(best_move != Move::none() && (best_move.is_capture() || best_move.is_promotion()))
+            && !((bound == Bound::Lower && best_value <= ss->static_eval)
+                || (bound == Bound::Upper && best_value >= ss->static_eval))) {
+            m_td.history.update_correction_history(pos, depth, best_value - raw_eval);
         }
     }
 
-    Bound bound   = best_value >= beta        ? Bound::Lower
-                  : best_move != Move::none() ? Bound::Exact
-                                              : Bound::Upper;
-    Move  tt_move = best_move != Move::none() ? best_move : tt_data ? tt_data->move : Move::none();
-    m_searcher.tt.store(pos, ply, raw_eval, tt_move, best_value, depth, ttpv, bound);
-
-    // Update to correction history.
-    if (!is_in_check
-        && !(best_move != Move::none() && (best_move.is_capture() || best_move.is_promotion()))
-        && !((bound == Bound::Lower && best_value <= ss->static_eval)
-             || (bound == Bound::Upper && best_value >= ss->static_eval))) {
-        m_td.history.update_correction_history(pos, depth, best_value - raw_eval);
-    }
+    
 
     return best_value;
 }
