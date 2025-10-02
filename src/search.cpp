@@ -669,9 +669,7 @@ Value Worker::search(
             m_td.history.update_correction_history(pos, depth, best_value - raw_eval);
         }
     }
-
     
-
     return best_value;
 }
 
