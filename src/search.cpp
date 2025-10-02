@@ -411,8 +411,9 @@ Value Worker::search(
         && tt_data->bound() != (tt_data->score > ss->static_eval ? Bound::Upper : Bound::Lower)) {
         tt_adjusted_eval = tt_data->score;
     }
+    
 
-    if (!PV_NODE && !is_in_check && depth <= tuned::rfp_depth
+    if (!tt_data->ttpv && !PV_NODE && !is_in_check && depth <= tuned::rfp_depth
         && tt_adjusted_eval >= beta + tuned::rfp_margin * depth) {
         return tt_adjusted_eval;
     }
