@@ -513,7 +513,6 @@ Value Worker::search(
                 reduction += 1024;
             }
 
-
             if (ttpv) {
                 reduction -= 1024 + 512 * PV_NODE;
             }
