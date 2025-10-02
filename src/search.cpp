@@ -513,8 +513,9 @@ Value Worker::search(
                 reduction += 1024;
             }
 
+
             if (ttpv) {
-                reduction -= 1024;
+                reduction -= 1024 + 512 * PV_NODE;
             }
 
             if (tt_data && tt_data->move.is_capture()) {
