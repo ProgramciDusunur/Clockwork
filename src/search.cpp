@@ -418,16 +418,8 @@ Value Worker::search(
         return tt_adjusted_eval;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     if (!PV_NODE && !is_in_check && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
         && tt_adjusted_eval >= beta + 30) {
-=======
-=======
->>>>>>> 3acb4a77f9479a1a47e6a9231d0d8243e4aa9ad2
-    if (!PV_NODE && !excluded && !is_in_check && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
-        && tt_adjusted_eval >= beta) {
->>>>>>> ccb945b (init Sİngular Extensions)
         int R =
           tuned::nmp_base_r + depth / 4 + std::min(3, (tt_adjusted_eval - beta) / 400) + improving;
         Position pos_after = pos.null_move();
