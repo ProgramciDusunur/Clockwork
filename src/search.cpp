@@ -493,7 +493,6 @@ Value Worker::search(
             }
         }
         
-
         // Singular extensions
         int extension = 0;
         if (!excluded && tt_data && m == tt_data->move && depth >= 7 && tt_data->depth >= depth - 3
