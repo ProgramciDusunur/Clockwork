@@ -492,12 +492,13 @@ Value Worker::search(
                 continue;
             }
         }
+        
 
         // Singular extensions
         int extension = 0;
         if (!excluded && tt_data && m == tt_data->move && depth >= 7 && tt_data->depth >= depth - 3
             && tt_data->bound() != Bound::Upper) {
-            Value singular_beta  = tt_data->score - depth * 2;
+            Value singular_beta  = tt_data->score - depth * 4;
             int   singular_depth = depth / 2;
 
             ss->excluded_move    = m;
