@@ -419,9 +419,12 @@ Value Worker::search(
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!PV_NODE && !is_in_check && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
         && tt_adjusted_eval >= beta + 30) {
 =======
+=======
+>>>>>>> 3acb4a77f9479a1a47e6a9231d0d8243e4aa9ad2
     if (!PV_NODE && !excluded && !is_in_check && !pos.is_kp_endgame() && depth >= tuned::nmp_depth
         && tt_adjusted_eval >= beta) {
 >>>>>>> ccb945b (init Sİngular Extensions)
