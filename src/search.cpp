@@ -519,6 +519,7 @@ Value Worker::search(
             else if (tt_data->score >= beta) {
                 extension = -1;
             }
+            
             // Cut Node Extensions
             else if (cutnode) {
                 extension = -2;
