@@ -518,8 +518,7 @@ Value Worker::search(
             // Negative Extensions
             else if (tt_data->score >= beta) {
                 extension = -2;
-            }
-            
+            }            
         }        
         
         // Do move
