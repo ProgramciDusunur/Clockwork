@@ -427,6 +427,11 @@ Value Worker::search(
         tt_adjusted_eval = tt_data->score;
     }
 
+    // Corrplexity Extension
+    if (ply < depth * 4 && tt_adjusted_eval != ss->static_eval && correction / 4096) {
+        depth++;
+    }
+
     if (!PV_NODE && !is_in_check && depth <= tuned::rfp_depth && !excluded
         && tt_adjusted_eval >= beta + tuned::rfp_margin * depth) {
         return tt_adjusted_eval;
