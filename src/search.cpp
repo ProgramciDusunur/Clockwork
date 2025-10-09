@@ -544,7 +544,13 @@ Value Worker::search(
 
             // Negative Extensions
             else if (tt_data->score >= beta) {
-                extension = -1 - PV_NODE;                
+                extension = -1 - PV_NODE;
+
+                // High Depth Reduction
+                // TT move is failed high, if our highest priority move failed high
+                // Then probably sub moves to likely fail high too
+                depth -= depth >= 15 && PV_NODE;
+                
             }
         }
 
