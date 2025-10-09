@@ -540,6 +540,7 @@ Value Worker::search(
                 if (quiet && singular_value <= singular_beta - 120) {
                     extension = 3;
                 }
+                
             }
 
             // Multicut
