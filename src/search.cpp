@@ -438,7 +438,6 @@ Value Worker::search(
 
     bool tt_pv_decision = tt_data && ttpv && tt_data->score >= beta + 90 - 15 * ((tt_data->depth + depth) / 2);
 
-
     if (!PV_NODE && !is_in_check && tt_pv_decision && depth <= tuned::rfp_depth && !excluded
         && tt_adjusted_eval >= beta + tuned::rfp_margin * depth) {
         return tt_adjusted_eval;
