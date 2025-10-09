@@ -549,8 +549,7 @@ Value Worker::search(
                 // High Depth Reduction
                 // TT move is failed high, if our highest priority move failed high
                 // Then probably sub moves to likely fail high too
-                depth -= depth >= 15 && PV_NODE;
-                
+                depth -= depth >= 15 && PV_NODE;                
             }
         }
 
