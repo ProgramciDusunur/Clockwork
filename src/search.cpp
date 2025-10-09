@@ -550,7 +550,6 @@ Value Worker::search(
                 // TT move is failed high, if our highest priority move failed high
                 // Then probably sub moves to likely fail high too
                 depth -= depth >= 12;
-
             }
         }
 
