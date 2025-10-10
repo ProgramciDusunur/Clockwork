@@ -214,6 +214,7 @@ Move Worker::iterative_deepening(const Position& root_position) {
     Value base_search_score = -VALUE_INF;
     Move  last_best_move    = Move::none();
     PV    last_pv{};
+    ss[SS_PADDING].root_depth = 0;
 
     const auto print_info_line = [&] {
         // Lambda to convert internal units score to uci score. TODO: add eval rescaling here once we get one
@@ -243,6 +244,7 @@ Move Worker::iterative_deepening(const Position& root_position) {
     for (Depth search_depth = 1; search_depth < MAX_PLY; search_depth++) {
         // Call search
         m_seldepth  = 0;
+        ss[SS_PADDING].root_depth = search_depth;
         Value alpha = -VALUE_INF, beta = VALUE_INF;
         Value delta = 50;
         if (search_depth >= 5) {
@@ -614,6 +616,13 @@ Value Worker::search(
         }
 
         if (PV_NODE && (moves_played == 1 || value > alpha)) {
+
+            // If we are following the TT move, root depth is high enough,
+            // There is no need to Quiescence Search (its pretty expensive)
+            if (tt_data && m == tt_data->move && ss->root_depth > 8 &&  tt_data->depth > 1) {
+                new_depth = std::max(new_depth, 1);
+            }
+
             value =
               -search<IS_MAIN, true>(pos_after, ss + 1, -beta, -alpha, new_depth, ply + 1, false);
         }
