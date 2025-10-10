@@ -615,8 +615,7 @@ Value Worker::search(
                                             ply + 1, !cutnode);
         }
 
-        if (PV_NODE && (moves_played == 1 || value > alpha)) {
-            
+        if (PV_NODE && (moves_played == 1 || value > alpha)) {            
             // If we are following the TT move, root depth is high enough,
             // There is no need to Quiescence Search (its pretty expensive)
             if (tt_data && m == tt_data->move && m_root_depth > 8 &&  tt_data->depth > 1) {
