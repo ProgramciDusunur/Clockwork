@@ -63,8 +63,7 @@ struct Stack {
     Move           killer      = Move::none();
     Move           excluded_move;
     ContHistEntry* cont_hist_entry = nullptr;
-    i32            fail_high_count = 0;
-    i32            root_depth = 0;
+    i32            fail_high_count = 0;    
     PV             pv;
 };
 
@@ -171,6 +170,7 @@ private:
     std::atomic<bool>        m_exiting;
     std::array<u64, 64 * 64> m_node_counts;
     Depth                    m_seldepth;
+    i32                      m_root_depth;
 
     template<bool IS_MAIN>
     Move iterative_deepening(const Position& root_position);
