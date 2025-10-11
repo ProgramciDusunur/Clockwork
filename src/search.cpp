@@ -539,8 +539,7 @@ Value Worker::search(
                 int double_margin = 40 + 80 * !quiet;
                 if (!PV_NODE && singular_value <= singular_beta - double_margin) {
                     extension = 2;
-                }
-                
+                }                
             }
 
             // Multicut
