@@ -550,6 +550,12 @@ Value Worker::search(
             else if (tt_data->score >= beta) {
                 extension = -1 - PV_NODE;                
             }
+
+            // Cut Node Extensions
+            else if (cutnode) {
+                extension = -2;
+            }
+            
         }
 
         // Do move
