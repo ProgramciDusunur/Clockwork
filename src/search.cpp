@@ -554,8 +554,7 @@ Value Worker::search(
             // Cut Node Extensions
             else if (cutnode) {
                 extension = -2;
-            }
-            
+            }            
         }
 
         // Do move
