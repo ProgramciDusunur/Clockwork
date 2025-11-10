@@ -576,6 +576,7 @@ Value Worker::search(
                 if (!PV_NODE && quiet && singular_value <= singular_beta - 200) {
                     extension = 4;
                 }
+                
             }
 
             // Multicut
