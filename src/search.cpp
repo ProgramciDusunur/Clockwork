@@ -574,8 +574,7 @@ Value Worker::search(
 
                 // Quadruple Extension
                 if (quiet && singular_value <= singular_beta - 200) {
-                    extension = 4;
-                    
+                    extension = 4;                    
                 }                
             }
 
