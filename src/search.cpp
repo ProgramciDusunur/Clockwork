@@ -577,7 +577,6 @@ Value Worker::search(
                 // Quadruple Extension                
                 if (!PV_NODE && singular_value <= singular_beta - 200 + 100 * !quiet) {
                     extension = 4;
-                    
                 }
             }
 
