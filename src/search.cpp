@@ -574,9 +574,10 @@ Value Worker::search(
                     extension = 3;
                 }
 
-                // Quadruple Extension                
-                if (!PV_NODE && singular_value <= singular_beta - 200 + 100 * !quiet) {
+                // Quadruple Extension
+                if (!PV_NODE && quiet && singular_value <= singular_beta - 175) {
                     extension = 4;
+                    
                 }
             }
 
