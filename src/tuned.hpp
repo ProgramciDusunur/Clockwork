@@ -23,6 +23,7 @@ namespace Clockwork::tuned {
     /* ProbCut Values */                                          \
     TUNE(probcut_margin, 300, 100, 500, 10, 0.002)                \
     TUNE(probcut_see, 100, 0, 200, 10, 0.002)                     \
+    TUNE(probcut_improving, 50, 0, 200, 10, 0.002)                \
                                                                   \
     /* SEE Values */                                              \
     TUNE(quiesce_see_threshold, 0, -1000, 100, 20, 0.002)         \
