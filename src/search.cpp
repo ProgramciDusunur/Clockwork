@@ -582,8 +582,7 @@ Value Worker::search(
 
         auto move_history = quiet ? m_td.history.get_quiet_stats(pos, m, ply, ss) : 0;
 
-        if (!ROOT_NODE && !is_being_mated_score(best_value)) {
-            
+        if (!ROOT_NODE && !is_being_mated_score(best_value)) {            
             // Late Move Pruning (LMP)
             if (moves_played >= (3 + depth * depth) / (2 - improving)) {
                 break;
