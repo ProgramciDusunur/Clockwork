@@ -1,3 +1,4 @@
+
 #include "search.hpp"
 #include "board.hpp"
 #include "common.hpp"
@@ -241,9 +242,12 @@ Move Worker::iterative_deepening(const Position& root_position) {
         std::cout << std::dec << "info depth " << last_search_depth << " seldepth " << last_seldepth
                   << " score " << format_score(last_search_score) << " nodes "
                   << m_searcher.node_count() << " nps "
-                  << time::nps(m_searcher.node_count(), curr_time - m_search_start) << " time "
-                  << time::cast<time::Milliseconds>(curr_time - m_search_start).count() << " pv "
-                  << last_pv << std::endl;
+                  << time::nps(m_searcher.node_count(), curr_time - m_search_start);
+        if (last_search_depth >= 16) {
+            std::cout << " hashfull " << m_searcher.tt.hashfull();
+        }
+        std::cout << " time " << time::cast<time::Milliseconds>(curr_time - m_search_start).count()
+                  << " pv " << last_pv << std::endl;
     };
 
     m_node_counts.fill(0);
@@ -403,6 +407,13 @@ Value Worker::search(
         // Insufficient material check
         if (pos.is_insufficient_material()) {
             return get_draw_score();
+        }
+        // Upcoming repetition detection
+        if (alpha < 0 && repetition_info.has_game_cycle(pos, static_cast<usize>(ply))) {
+            alpha = 0;
+            if (alpha >= beta) {
+                return alpha;
+            }
         }
     }
 
@@ -612,7 +623,8 @@ Value Worker::search(
                 extension = 1;
 
                 // Double Extension
-                if (!PV_NODE && singular_value <= singular_beta - 40) {
+                int double_margin = 40 - (move_history / 512 * quiet);
+                if (!PV_NODE && singular_value <= singular_beta - double_margin) {
                     extension = 2;
                 }
 
@@ -868,6 +880,14 @@ Value Worker::quiesce(const Position& pos, Stack* ss, Value alpha, Value beta, i
     // 50 mr check
     if (pos.get_50mr_counter() >= 100) {
         return get_draw_score();
+    }
+
+    // Upcoming repetition detection
+    if (alpha < 0 && repetition_info.has_game_cycle(pos, static_cast<usize>(ply))) {
+        alpha = 0;
+        if (alpha >= beta) {
+            return alpha;
+        }
     }
 
     // Return eval if we exceed the max ply.
