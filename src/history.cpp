@@ -46,8 +46,6 @@ void History::update_cont_hist(
         auto main_hist_enhanced_entry = ((*(ss - 1)->cont_hist_entry)[stm_idx][pt_idx][move.to().raw] +
                                         m_main_hist[static_cast<usize>(pos.active_color())][move.from_to()]
                                         [from_attacked * 2 + to_attacked]) / 2;
-
-
         update_hist_entry_banger(main_hist_enhanced_entry,
                                  conthist, bonus);
     }
