@@ -41,7 +41,12 @@ void History::update_cont_hist(
     usize     pt_idx   = static_cast<usize>(pt) - static_cast<usize>(PieceType::Pawn);
     usize     stm_idx  = static_cast<usize>(pos.active_color());
     if (ply >= 1 && (ss - 1)->cont_hist_entry != nullptr) {
-        update_hist_entry_banger((*(ss - 1)->cont_hist_entry)[stm_idx][pt_idx][move.to().raw],
+        auto main_hist_enhanced_entry = ((*(ss - 1)->cont_hist_entry)[stm_idx][pt_idx][move.to().raw] +
+                                        m_main_hist[static_cast<usize>(pos.active_color())][move.from_to()]
+                                        [from_attacked * 2 + to_attacked]) / 2;
+                                        
+
+        update_hist_entry_banger(main_hist_enhanced_entry,
                                  conthist, bonus);
     }
     if (ply >= 2 && (ss - 2)->cont_hist_entry != nullptr) {
