@@ -680,6 +680,9 @@ Value Worker::search(
             else if (tt_data->score >= beta) {
                 extension = -1 - PV_NODE;
             }
+        } else if (depth <= 7 && !in_check && cutnode && tt_adjusted_eval <= alpha - 25) {
+            
+            extension = 1;
         }
 
         // Simplified captures extension
