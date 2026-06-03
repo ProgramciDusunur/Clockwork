@@ -683,7 +683,6 @@ Value Worker::search(
         }
         // Low Depth Singular Extensions
         else if (depth <= 7 && !is_in_check && cutnode && tt_adjusted_eval <= alpha - 150) {
-
             extension = 1;
         }
 
