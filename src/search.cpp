@@ -682,8 +682,8 @@ Value Worker::search(
             }
         }
         // Low Depth Singular Extensions
-        } else if (depth <= 7 && !is_in_check && cutnode && tt_adjusted_eval <= alpha - 100) {
-            
+        else if (depth <= 7 && !is_in_check && cutnode && tt_adjusted_eval <= alpha - 100) {
+
             extension = 1;
         }
 
