@@ -681,6 +681,12 @@ Value Worker::search(
                 extension = -1 - PV_NODE;
             }
         }
+        // Low Depth Singular Extensions
+        } else if (depth <= 7 && !is_in_check && cutnode && tt_adjusted_eval <= alpha - 100) {
+            
+            extension = 1;
+        }
+
 
         // Simplified captures extension
         if (extension == 0 && m.is_capture() && !m.is_en_passant()) {
