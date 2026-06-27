@@ -134,7 +134,7 @@ public:
     Position       root_position;
     RepetitionInfo repetition_info;
 
-    Worker(Searcher& searcher, ThreadType thread_type);
+    Worker(Searcher& searcher, ThreadType thread_type, u64 id);
     ~Worker();
 
     void exit();
@@ -164,7 +164,12 @@ public:
         return (search_nodes() & 3) - 2;  // Randomize between -2 and +2
     }
 
+    [[nodiscard]] u64 id() const {
+        return m_id;
+    }
+
 private:
+    u64 m_id;
     void thread_main();
 
     void increment_search_nodes() {

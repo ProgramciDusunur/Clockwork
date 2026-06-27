@@ -119,9 +119,9 @@ void Searcher::initialize(size_t thread_count) {
     started_barrier = std::make_unique<std::barrier<>>(1 + thread_count);
 
     if (thread_count > 0) {
-        m_workers.push_back(make_unique_huge_page<Worker>(*this, ThreadType::MAIN));
+        m_workers.push_back(make_unique_huge_page<Worker>(*this, ThreadType::MAIN, 0));
         for (size_t i = 1; i < thread_count; i++) {
-            m_workers.push_back(make_unique_huge_page<Worker>(*this, ThreadType::SECONDARY));
+            m_workers.push_back(make_unique_huge_page<Worker>(*this, ThreadType::SECONDARY, static_cast<u64>(i)));
         }
     }
 }
@@ -146,9 +146,10 @@ u64 Searcher::node_count() {
     return nodes;
 }
 
-Worker::Worker(Searcher& searcher, ThreadType thread_type) :
+Worker::Worker(Searcher& searcher, ThreadType thread_type, u64 id) :
     m_searcher(searcher),
-    m_thread_type(thread_type) {
+    m_thread_type(thread_type),
+    m_id(id) {
     m_stopped = false;
     m_exiting = false;
     m_thread  = std::thread(&Worker::thread_main, this);
@@ -781,6 +782,10 @@ Value Worker::search(
             if (!quiet) {
                 reduction = std::min(reduction, tuned::lmr_max_red);
             }
+
+            // Dynamic helper thread reduction bias (from Reckless)
+            // giving each thread a different reduction offset that changes over time
+            reduction += static_cast<i32>((search_nodes() + m_id * 23) % 128) - 64;
 
             reduction /= 1024;
 
