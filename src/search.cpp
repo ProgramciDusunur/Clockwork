@@ -811,7 +811,15 @@ Value Worker::search(
                 }
             }
         } else if (!PV_NODE || moves_played > 1) {
-            value = -search<IS_MAIN, false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth,
+            i32 nonpv_depth = new_depth * 1024;
+
+            // Dynamic helper thread depth bias for non-PV zero-window search
+            
+            nonpv_depth += static_cast<i32>((search_nodes() + m_id * 23) % 1078) - 27;
+
+            nonpv_depth /= 1024;
+
+            value = -search<IS_MAIN, false>(pos_after, ss + 1, -alpha - 1, -alpha, static_cast<Depth>(nonpv_depth),
                                             ply + 1, !cutnode);
         }
 
