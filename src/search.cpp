@@ -1042,6 +1042,7 @@ Value Worker::search(
         // static eval failed low, 
         // we should give more priority for the best move and penalty for other moves
         bonus_depth += (!is_in_check && tt_adjusted_eval <= alpha);
+        
         const i32 bonus       = stat_bonus(bonus_depth);
         const i32 malus       = stat_malus(bonus_depth);
         if (quiet_move(best_move)) {
